@@ -31,6 +31,7 @@
 
 package com.github.jleskovar;
 
+import org.bitcoinj.core.ECKey;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -40,15 +41,21 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public class Secp256k1KeyGeneration {
 
     @Benchmark
-    public void testMethod() throws InterruptedException {
-        // TODO key generation
-        Thread.sleep(100);
+    public byte[] bitcoinjEckeyPubKeyGeneration() throws InterruptedException {
+        return new ECKey().getPubKey();
+    }
+
+    @Benchmark
+    public byte[] bitcoinjEckeyPubKeyHashGeneration() throws InterruptedException {
+        return new ECKey().getPubKeyHash();
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(Secp256k1KeyGeneration.class.getSimpleName())
                 .forks(1)
+                .warmupIterations(3)
+                .measurementIterations(3)
                 .build();
 
         new Runner(opt).run();
