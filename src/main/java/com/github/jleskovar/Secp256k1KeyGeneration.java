@@ -31,6 +31,10 @@
 
 package com.github.jleskovar;
 
+import java.security.SecureRandom;
+
+import org.bitcoin.NativeSecp256k1;
+import org.bitcoin.NativeSecp256k1Utils;
 import org.bitcoinj.core.ECKey;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.Runner;
@@ -38,16 +42,25 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import com.google.common.io.BaseEncoding;
+
 public class Secp256k1KeyGeneration {
 
     @Benchmark
-    public byte[] bitcoinjEckeyPubKeyGeneration() throws InterruptedException {
+    public byte[] bitcoinjEckeyPubKeyGeneration() {
         return new ECKey().getPubKey();
     }
 
     @Benchmark
-    public byte[] bitcoinjEckeyPubKeyHashGeneration() throws InterruptedException {
+    public byte[] bitcoinjEckeyPubKeyHashGeneration() {
         return new ECKey().getPubKeyHash();
+    }
+
+    @Benchmark
+    public byte[] libsecp256k1PubKeyGeneration() throws NativeSecp256k1Utils.AssertFailException {
+        byte[] randomBytes = new byte[32];
+        new SecureRandom().nextBytes(randomBytes);
+        return NativeSecp256k1.computePubkey(randomBytes, 1);
     }
 
     public static void main(String[] args) throws RunnerException {
